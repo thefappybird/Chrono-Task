@@ -9,11 +9,10 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![SASS](https://img.shields.io/badge/SASS-1.97-CC6699?style=for-the-badge&logo=sass&logoColor=white)](https://sass-lang.com/)
 
-[![License](https://img.shields.io/badge/License-MIT-22c55e?style=flat-square)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-14b8a6?style=flat-square)](CONTRIBUTING.md)
 [![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000?style=flat-square&logo=vercel)](https://chronotask.vercel.app)
 
-[Live Demo](https://chronotask.vercel.app) · [Report Bug](https://github.com/yourusername/chronotask/issues) · [Request Feature](https://github.com/yourusername/chronotask/issues)
+[Live Demo](https://chronotask.vercel.app) · [Report Bug](https://github.com/thefappybird/chronotask/issues) · [Request Feature](https://github.com/thefappybird/chronotask/issues)
 
 </div>
 
@@ -90,44 +89,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 
 ---
 
-## Project Structure
-
-```
-chronotask/
-├── app/
-│   ├── layouts/
-│   │   └── default.vue     # Root layout
-│   ├── pages/
-│   │   └── index.vue       # Main dashboard page
-│   ├── components/         # Vue components
-│   │   ├── TheSidebar.vue  # Navigation sidebar
-│   │   ├── TheHeader.vue   # Top header with search
-│   │   ├── TaskColumn.vue  # Individual task columns
-│   │   ├── TaskCard.vue    # Task card component
-│   │   └── TheStats.vue    # Statistics dashboard
-│   ├── assets/
-│   │   └── styles/
-│   │       └── globals.scss # Global styles & design tokens
-│   └── utils/
-│       ├── task-board.ts   # Mock database & queries
-│       └── models.ts       # TypeScript interfaces
-└── public/
-    └── ...                 # Static assets
-```
-
----
-
 ## Design Decisions
-
-### Color Palette
-
-| Color | Hex | Usage |
-|-------|-----|-------|
-| Slate 950 | `#0f172a` | Background |
-| Slate 100 | `#f1f5f9` | Primary text |
-| Teal 500 | `#14b8a6` | Accent / Interactive |
-| Coral 500 | `#f97316` | Destructive actions |
-| Amber 500 | `#f59e0b` | Warnings |
 
 ### Loading Strategy
 
@@ -161,15 +123,9 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 
 ---
 
-## License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
----
-
 <div align="center">
 
-**Built with care by [Your Name](https://github.com/yourusername)**
+**Built with care by Alexander Banaag(https://github.com/thefappybird)**
 
 If you found this useful, please consider giving it a star!
 
