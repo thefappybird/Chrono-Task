@@ -29,15 +29,14 @@ function filterTasks(
 }
 
 export function useColumns() {
-  const { read, update, readOne } = useCrud();
+  const { items, update, readOne } = useCrud();
   const columns = ref<Column[]>([]);
 
-  async function readColumns(
+  function readColumns(
     filterKey: FilterKey | null = null,
     filter: string | string[] | null = null,
   ) {
     try {
-      const items = await read();
       const cols: Column[] = [
         { id: "todo", title: "To Do", tasks: [] },
         { id: "in-progress", title: "In Progress", tasks: [] },
@@ -46,7 +45,7 @@ export function useColumns() {
 
       for (const column of cols) {
         const sorted = sortTasks(
-          items.filter((task: Task) => task.status === column.id),
+          items.value.filter((task: Task) => task.status === column.id),
         );
         column.tasks = filterTasks(sorted, filterKey, filter);
       }
@@ -59,12 +58,10 @@ export function useColumns() {
   }
 
   // Group tasks into columns by createdAt date (YYYY-MM-DD)
-  async function readColumnsByDate(
+  function readColumnsByDate(
     filterKey: FilterKey | null = null,
     filter: string | string[] | null = null,
   ) {
-    const items = await read();
-
     // Date range: start of current month to end of next month
     const now = new Date();
     const start = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -77,7 +74,7 @@ export function useColumns() {
     }
 
     // Assign tasks by createdAt date
-    for (const task of items) {
+    for (const task of items.value) {
       const dateKey = new Date(task.createdAt).toISOString().slice(0, 10);
       if (groups[dateKey]) groups[dateKey].push(task);
     }
