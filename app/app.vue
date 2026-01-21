@@ -1,9 +1,9 @@
 <template>
   <NuxtLayout>
-     <NuxtPage/>
+    <NuxtPage />
   </NuxtLayout>
+  <LazyTheModal />
+  <LazyTheToast />
 </template>
 
-<script setup lang="ts">
-
-  </script>
+<script setup lang="ts"></script>
