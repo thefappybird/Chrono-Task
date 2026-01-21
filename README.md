@@ -214,9 +214,8 @@ The application will be available at **[http://localhost:3000](http://localhost:
 | `npm run dev`       | Start development server with hot reload |
 | `npm run build`     | Build for production                     |
 | `npm run preview`   | Preview production build locally         |
-| `npm run lint`      | Run ESLint on source files               |
+| `npm run generate`  | Prerender every route                    |
 | `npm test`          | Run Vitest unit tests                    |
-| `npm run test:unit` | Run unit tests with coverage             |
 
 ---
 
