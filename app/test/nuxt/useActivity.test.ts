@@ -1,4 +1,6 @@
+import { mount } from "@vue/test-utils";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { defineComponent } from "vue";
 
 // Mocks for dependencies
 vi.stubGlobal("crypto", {
@@ -14,9 +16,19 @@ global.localStorage = {
 
 describe("useActivity", () => {
   let composable: ReturnType<typeof useActivity>;
-
+  const createTestComponent = () => {
+    return defineComponent({
+      setup() {
+        const activity = useActivity();
+        return { activity };
+      },
+      template: "<div></div>",
+    });
+  };
   beforeEach(() => {
-    composable = useActivity();
+    const TestComp = createTestComponent();
+    const wrapper = mount(TestComp);
+    composable = wrapper.vm.activity;
     composable.activities.value = [];
   });
 
