@@ -1,6 +1,5 @@
 @use "sass:list";
 
-
 :root {
   /* Deep slate dark theme - sophisticated and modern */
   --background: oklch(0.13 0.01 260);
@@ -42,73 +41,114 @@
   /* Custom colors for task priorities */
   --success: oklch(0.7 0.15 145);
   --warning: oklch(0.75 0.15 60);
+  /* Skeleton defaults — can be overridden per-theme or container */
+  --skeleton-muted: var(--muted);
+  --skeleton-highlight: var(--muted-foreground);
 }
-
-body, html {
-    font-family: 'Lato', sans-serif;
-    font-weight: 400; 
-    background-color: var(--background);
-    color: var(--foreground);
-  }
-
-*{
+* {
+  font-family: "Lato", sans-serif;
   box-sizing: border-box;
   transition: all 0.3s ease;
   margin: 0;
   padding: 0;
+  scrollbar-color: var(--secondary) var(--primary-foreground);
+  scrollbar-width: thin;
 }
+
+body,
+html {
+  font-weight: 400;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+textarea {
+  resize: none;
+}
+
 input[type="checkbox"] {
   -webkit-appearance: none; /* For older WebKit/Blink browsers */
-  -moz-appearance: none;    /* For older Firefox browsers */
-  appearance: none;         /* Standard property */
+  -moz-appearance: none; /* For older Firefox browsers */
+  appearance: none; /* Standard property */
   /* Add custom styles here */
 }
 
-button{
+button {
   cursor: pointer;
   border-radius: 0.5rem;
   background: none;
   border: none;
 }
 
-input{
+input {
   outline: none;
   border: none;
-  background: none
+  background: none;
 }
 
 // Lato font examples
 // Regular weights
-.text-thin { font-weight: 100; }           // Lato Thin
-.text-light { font-weight: 300; }          // Lato Light
-.text-regular { font-weight: 400; }        // Lato Regular
-.text-bold { font-weight: 700; }           // Lato Bold
-.text-black { font-weight: 900; }          // Lato Black
+.text-thin {
+  font-weight: 100;
+} // Lato Thin
+.text-light {
+  font-weight: 300;
+} // Lato Light
+.text-regular {
+  font-weight: 400;
+} // Lato Regular
+.text-bold {
+  font-weight: 700;
+} // Lato Bold
+.text-black {
+  font-weight: 900;
+} // Lato Black
 
 // Italic weights
-.text-thin-italic { font-weight: 100; font-style: italic; }     // Lato Thin Italic
-.text-light-italic { font-weight: 300; font-style: italic; }    // Lato Light Italic
-.text-regular-italic { font-weight: 400; font-style: italic; }  // Lato Regular Italic
-.text-bold-italic { font-weight: 700; font-style: italic; }     // Lato Bold Italic
-.text-black-italic { font-weight: 900; font-style: italic; }    // Lato Black Italic
+.text-thin-italic {
+  font-weight: 100;
+  font-style: italic;
+} // Lato Thin Italic
+.text-light-italic {
+  font-weight: 300;
+  font-style: italic;
+} // Lato Light Italic
+.text-regular-italic {
+  font-weight: 400;
+  font-style: italic;
+} // Lato Regular Italic
+.text-bold-italic {
+  font-weight: 700;
+  font-style: italic;
+} // Lato Bold Italic
+.text-black-italic {
+  font-weight: 900;
+  font-style: italic;
+} // Lato Black Italic
 
-.container{
+.container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 15px;
   width: 100%;
 }
 
-.flex{
+.flex {
   display: flex;
 }
-.sidebar-section{
+
+.focused {
+  border-color: var(--primary);
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.sidebar-section {
   padding: 0.5rem;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.standard-btn{
+.standard-btn {
   // justify-content: center;
   align-items: center;
   gap: 0.5rem;
@@ -119,30 +159,84 @@ input{
   }
 }
 
-@mixin circle(){
-  border-radius: 10rem;
-  background-color: var(--accent);
-  padding: 0 5px;  
+.input-field {
+  border: 1px solid var(--border);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  gap: 0.5rem;
+  align-items: center;
+  transition: border-color 0.2s ease;
+  color: var(--foreground);
+  background: none;
 }
 
-@mixin column-layout(){
+.no-scroll {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+.cancel {
+  background-color: var(--destructive);
+  &:hover {
+    color: var(--background);
+    background-color: var(--destructive-foreground);
+  }
+}
+@mixin circle() {
+  border-radius: 10rem;
+  background-color: var(--accent);
+  padding: 0 5px;
+}
+
+@mixin vertical-cont() {
   flex-direction: column;
-  height: 100%;
+  gap: 0.5rem;
+}
+
+@mixin column-layout() {
+  flex-direction: column;
+  height: 90vh;
   border: 1px solid var(--border);
   border-radius: 0.5rem;
-  .col-header{
+  overflow-y: auto;
+  .col-header {
     justify-content: space-between;
     border-bottom: 1px solid var(--border);
     padding: 1rem;
-    .actions{
-      button{
+    margin-bottom: 0.5rem;
+    .actions {
+      button {
         align-items: center;
         color: var(--sidebar-foreground);
       }
     }
-    .title{
+    .title {
       gap: 1rem;
       align-items: center;
     }
+  }
+}
+@mixin badge() {
+  border-radius: 1rem;
+  padding: 0.25rem 0.75rem;
+}
+// Skeleton shimmer reusable mixin
+@mixin skeleton-shimmer($duration: 1.5s) {
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-muted, var(--muted, #e0e0e0)) 25%,
+    var(--skeleton-highlight, var(--muted-foreground, #f0f0f0)) 50%,
+    var(--skeleton-muted, var(--muted, #e0e0e0)) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer $duration infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
   }
 }

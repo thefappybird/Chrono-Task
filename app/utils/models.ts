@@ -1,43 +1,66 @@
-// Type definition for navigation items with lucide icons
-export interface NavItem {
-    icon: string;
-    label: string;
-    active?: boolean;
-    badge?: number;
-  }
+export type Priority = "low" | "medium" | "high";
+export type Status = "todo" | "in-progress" | "done";
+export type ModalType = "create" | "edit" | "delete";
+export type ViewType = "board" | "list" | "calendar";
 
-export interface Task {
-  id: string
-  title: string
-  description?: string
-  priority: "low" | "medium" | "high"
-  assignee?: {
-      name: string
-      avatar: string
-  }
-  dueDate?: string
-  tags?: string[]
+export type Action =
+  | "task:editing"
+  | "task:create"
+  | "task:update"
+  | "task:delete";
+export interface NavItem {
+  icon: string;
+  label: string;
+  active?: boolean;
+  badge?: number;
 }
 
 export interface Column {
-    id: string
-    title: string
-    tasks: Task[]
+  id: Status | string;
+  title: string;
+  date?: Date;
+  tasks: Task[];
 }
 
-
 export interface Stat {
-  label: string
-  value: string
-  change: string
-  trend: "up" | "down"
-  icon: string
+  label: string;
+  value: string;
+  change: string;
+  trend: "up" | "down";
+  icon: string;
 }
 
 export interface Activity {
-  id: string
-  user: string
-  action: string
-  target: string
-  time: string
+  id: string;
+  taskId: string;
+  userId: string;
+  action: Action;
+  time: string;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  avatarUrl?: string;
+  Tasks: Task[];
+}
+
+export interface Task {
+  id?: string;
+  assignee?: string;
+  title: string;
+  description: string;
+  priority: Priority;
+  status: Status;
+  tags: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  position?: number;
+}
+
+export interface Toast {
+  id: string;
+  description: string;
+  type: "good" | "bad";
+  timestamp: Date;
 }
