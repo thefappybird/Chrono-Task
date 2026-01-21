@@ -56,8 +56,8 @@ onMounted(async () => {
     }
     if (taskColumn.value.length == 0) {
       let response;
-      if (view.value !== "calendar") response = await readColumns();
-      else response = await readColumnsByDate();
+      if (view.value !== "calendar") response = readColumns();
+      else response = readColumnsByDate();
       if (response) {
         taskColumn.value = response;
       }
@@ -71,12 +71,14 @@ onMounted(async () => {
 
 watch(
   [items, view],
-  async () => {
+  async ([newItem, newView], [oldItem, oldView]) => {
     try {
       let response;
-      loading.value = true;
-      if (view.value !== "calendar") response = await readColumns();
-      else response = await readColumnsByDate();
+      if (oldView !== newView) {
+        loading.value = true;
+      }
+      if (view.value !== "calendar") response = readColumns();
+      else response = readColumnsByDate();
       if (response) {
         taskColumn.value = response;
       }

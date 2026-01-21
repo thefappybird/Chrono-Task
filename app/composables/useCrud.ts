@@ -1,7 +1,3 @@
-/**
- * CRUD composable for Task objects, with optimistic updates, simulated errors, and activity logging.
- * All consumers share the same items state.
- */
 const items = useLocalStorage<Task[]>("tasks", []);
 
 export function useCrud() {
@@ -12,7 +8,7 @@ export function useCrud() {
       let attempts = 0;
 
       const tryDelay = () => {
-        const timeout = setTimeout(() => {
+        setTimeout(() => {
           attempts++;
 
           if (Math.random() < failureRate) {
@@ -30,9 +26,7 @@ export function useCrud() {
       tryDelay();
     });
   }
-  /**
-   * Create a new task (optimistic, with activity log).
-   */
+
   async function create(data: Partial<Task>, options: CrudOptions = {}) {
     const optimisticItem: Task = {
       ...data,
@@ -58,7 +52,7 @@ export function useCrud() {
   }
 
   async function read(options: CrudOptions = {}) {
-    await delay(400, 0, 0);
+    await delay(400, 0, 0); //read has no failure simulation
 
     return [...items.value].sort(
       (a, b) =>
@@ -67,7 +61,7 @@ export function useCrud() {
   }
 
   async function readOne(id?: string) {
-    await delay(400);
+    await delay(400, 0, 0); //readOne has no failure simulation
     if (!id) throw new Error("No ID provided to readOne");
 
     return items.value.find((item: Task) => item.id === id);
@@ -115,9 +109,6 @@ export function useCrud() {
     }
   }
 
-  /**
-   * Remove a task (optimistic, with activity log).
-   */
   async function remove(id?: string) {
     if (id === undefined) throw new Error("No ID provided to update");
     const prevItem = items.value.find((item) => item.id === id);
@@ -136,9 +127,7 @@ export function useCrud() {
       });
     }
   }
-  /**
-   * Helper to log a task activity for the current user.
-   */
+
   function logActivity(action: Action, taskId?: string) {
     try {
       if (!taskId) throw new Error("No taskId provided for activity log");
