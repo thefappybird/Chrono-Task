@@ -38,7 +38,7 @@ const { items } = useCrud();
 const { readColumns, readColumnsByDate } = useColumns();
 const { handleError } = useHandleError();
 const { view } = storeToRefs(useViewStore());
-// useWebSocket();
+useWebSocket();
 
 provide("loading", loading);
 
