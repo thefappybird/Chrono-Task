@@ -189,7 +189,7 @@ Chrono-Task/
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/Chrono-Task.git
+git clone https://github.com/thefappybird/Chrono-Task.git
 cd Chrono-Task
 
 # 2. Install dependencies
@@ -481,7 +481,7 @@ Built with ❤️ using Vue 3, Nuxt, and TypeScript
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/chronotask.git
+git clone https://github.com/thefappybird/chronotask.git
 
 # Navigate to directory
 cd chronotask
