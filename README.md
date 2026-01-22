@@ -252,19 +252,6 @@ try {
 }
 ```
 
-### Reactive LocalStorage with Caching
-
-```typescript
-// Ensures same ref instance across all consumers
-const stateCache = new Map<string, Ref<unknown>>();
-export function useLocalStorage<T>(key: string, initialValue: T): Ref<T> {
-  if (stateCache.has(key)) {
-    return stateCache.get(key) as Ref<T>;
-  }
-  // ... initialization logic
-}
-```
-
 ### Virtual Scrolling for Performance
 
 ```typescript
