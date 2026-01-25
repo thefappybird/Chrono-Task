@@ -37,8 +37,8 @@ const showOptions = ref(false);
 const { items } = useCrud();
 const { readColumns, readColumnsByDate } = useColumns();
 const { handleError } = useHandleError();
+const { start, stop } = useWebSocket();
 const { view } = storeToRefs(useViewStore());
-useWebSocket();
 
 provide("loading", loading);
 
@@ -49,6 +49,7 @@ function toggleOptions() {
 onMounted(async () => {
   try {
     loading.value = true;
+    start();
     const seededTasks = seedLocalStorage();
     // If we just seeded, sync to the reactive items ref
     if (seededTasks) {
@@ -93,6 +94,9 @@ watch(
 function updateColumns(filteredColumns: Column[]) {
   taskColumn.value = filteredColumns;
 }
+onBeforeUnmount(() => {
+  stop();
+});
 </script>
 
 <style lang="scss" scoped>

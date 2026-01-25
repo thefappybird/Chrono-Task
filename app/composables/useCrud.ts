@@ -3,6 +3,7 @@ const items = useLocalStorage<Task[]>("tasks", []);
 export function useCrud() {
   const user = useUser();
   const activity = useActivity();
+  const { broadcastActivity } = useWebSocket();
   function delay(ms = 400, retries = 5, failureRate = 0.5): Promise<void> {
     return new Promise((resolve, reject) => {
       let attempts = 0;
@@ -133,12 +134,13 @@ export function useCrud() {
       if (!taskId) throw new Error("No taskId provided for activity log");
       const currentUserId =
         user.getUser()?.id ?? localStorage.getItem("userId") ?? "";
-      activity.addActivity({
+      const loggedActivity = activity.addActivity({
         userId: currentUserId,
         taskId,
         action,
         time: new Date().toISOString(),
       });
+      broadcastActivity(loggedActivity);
     } catch (e) {}
   }
 

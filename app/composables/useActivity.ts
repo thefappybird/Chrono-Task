@@ -4,9 +4,7 @@ const tasks = useLocalStorage<Task[]>("tasks", []);
 
 export function useActivity() {
   const toast = useToastStore();
-
   const generatorRunning = ref(false);
-  let timer: number | null = null;
 
   function addActivity(data: Partial<Activity>, type?: "good" | "bad") {
     const activity: Activity = {
@@ -17,10 +15,8 @@ export function useActivity() {
       time: data.time ?? new Date().toISOString(),
     };
     activities.value.unshift(activity);
-    showActivityToast(activity, type);
     return activity;
   }
-
   function showActivityToast(
     activity: Activity,
     overrideType?: "good" | "bad",
@@ -66,38 +62,13 @@ export function useActivity() {
       ? tasks.value[Math.floor(Math.random() * tasks.value.length)]
       : undefined;
     if (randomUser) {
-      addActivity({
+      return addActivity({
         userId: randomUser.id,
         taskId: maybeTask?.id,
         action,
         time: new Date().toISOString(),
       });
     }
-  }
-
-  function startGenerator(minSeconds = 5, maxSeconds = 15) {
-    if (generatorRunning.value) return;
-    generatorRunning.value = true;
-    const scheduleNext = () => {
-      if (!generatorRunning.value) return;
-      const minMs = Math.max(0, Math.floor(minSeconds) * 1000);
-      const maxMs = Math.max(minMs, Math.floor(maxSeconds) * 1000);
-      const delta = maxMs - minMs;
-      const intervalMs = minMs + Math.floor(Math.random() * (delta + 1));
-      timer = window.setTimeout(() => {
-        createRandomActivity();
-        scheduleNext();
-      }, intervalMs) as unknown as number;
-    };
-    scheduleNext();
-  }
-
-  function stopGenerator() {
-    if (timer) {
-      clearTimeout(timer as number);
-      timer = null;
-    }
-    generatorRunning.value = false;
   }
 
   function simulateOtherUserEditing(taskId: string) {
@@ -136,17 +107,14 @@ export function useActivity() {
     return true;
   }
 
-  onBeforeUnmount(() => stopGenerator());
-
   return {
     activities,
     addActivity,
     createRandomActivity,
-    startGenerator,
-    stopGenerator,
     generatorRunning,
     simulateOtherUserEditing,
     isTaskRecentlyEditedByOther,
     checkAndBlockIfEdited,
+    showActivityToast,
   };
 }
