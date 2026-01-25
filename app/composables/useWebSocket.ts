@@ -76,8 +76,6 @@ export function useWebSocket(url = "wss://echo.websocket.org") {
   }
 
   function broadcastActivity(activity: Activity) {
-    console.log("activity");
-
     sendMessage(
       JSON.stringify({ type: "activity", data: activity }),
       connection.value,
