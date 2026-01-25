@@ -27,6 +27,9 @@ export default defineNuxtConfig({
       pathPrefix: false,
     },
   ],
+  imports: {
+    dirs: ["utils", "utils/models", "utils/functions"],
+  },
   css: ["~/assets/styles/globals.scss"],
   googleFonts: {
     families: {
