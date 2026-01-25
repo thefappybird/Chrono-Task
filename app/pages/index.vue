@@ -34,11 +34,12 @@
 const taskColumn = ref<Column[]>([]);
 const loading = ref<boolean>(false);
 const showOptions = ref(false);
-const { items } = useCrud();
 const { readColumns, readColumnsByDate } = useColumns();
 const { handleError } = useHandleError();
 const { start, stop } = useWebSocket();
 const { view } = storeToRefs(useViewStore());
+const taskStore = useTaskStore();
+const { rawTasks } = storeToRefs(taskStore);
 
 provide("loading", loading);
 
@@ -51,9 +52,9 @@ onMounted(async () => {
     loading.value = true;
     start();
     const seededTasks = seedLocalStorage();
-    // If we just seeded, sync to the reactive items ref
+    // If we just seeded, sync to the store
     if (seededTasks) {
-      items.value = seededTasks;
+      taskStore.updateTasks(seededTasks);
     }
     if (taskColumn.value.length == 0) {
       let response;
@@ -71,8 +72,8 @@ onMounted(async () => {
 });
 
 watch(
-  [items, view],
-  async ([newItem, newView], [oldItem, oldView]) => {
+  [rawTasks, view],
+  async ([newTasks, newView], [oldTasks, oldView]) => {
     try {
       let response;
       if (oldView !== newView) {

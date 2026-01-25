@@ -29,7 +29,8 @@ function filterTasks(
 }
 
 export function useColumns() {
-  const { items, update, readOne } = useCrud();
+  const taskStore = useTaskStore();
+  const { update, readOne } = useCrud();
   const columns = ref<Column[]>([]);
 
   function readColumns(
@@ -45,7 +46,7 @@ export function useColumns() {
 
       for (const column of cols) {
         const sorted = sortTasks(
-          items.value.filter((task: Task) => task.status === column.id),
+          taskStore.rawTasks.filter((task: Task) => task.status === column.id),
         );
         column.tasks = filterTasks(sorted, filterKey, filter);
       }
@@ -74,7 +75,7 @@ export function useColumns() {
     }
 
     // Assign tasks by createdAt date
-    for (const task of items.value) {
+    for (const task of taskStore.rawTasks) {
       const dateKey = new Date(task.createdAt).toISOString().slice(0, 10);
       if (groups[dateKey]) groups[dateKey].push(task);
     }

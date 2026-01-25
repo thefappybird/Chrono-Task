@@ -1,5 +1,3 @@
-import { defineStore } from "pinia";
-
 export const useModalStore = defineStore("modal", () => {
   const isOpen = ref(false);
   const modalType = ref<ModalType | null>(null);

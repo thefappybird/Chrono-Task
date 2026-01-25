@@ -1,9 +1,9 @@
-const items = useLocalStorage<Task[]>("tasks", []);
-
 export function useCrud() {
+  const taskStore = useTaskStore();
   const user = useUser();
   const activity = useActivity();
   const { broadcastActivity } = useWebSocket();
+
   function delay(ms = 400, retries = 5, failureRate = 0.5): Promise<void> {
     return new Promise((resolve, reject) => {
       let attempts = 0;
@@ -36,15 +36,18 @@ export function useCrud() {
       createdAt: new Date(),
       updatedAt: new Date(),
     } as Task;
-    const previousItems = items.value.slice();
-    items.value.unshift(optimisticItem);
+
+    // Optimistic update to store
+    taskStore.addTask(optimisticItem);
+
     try {
       await delay(400, 5, 0.2);
       user.addTask(optimisticItem);
       logActivity("task:create", optimisticItem.id);
       return optimisticItem;
     } catch (error) {
-      items.value = previousItems;
+      // Rollback
+      taskStore.removeTask(optimisticItem.id!);
       throw Object.assign(error as Error, {
         id: optimisticItem.id,
         optimistic: true,
@@ -53,24 +56,19 @@ export function useCrud() {
   }
 
   async function read(options: CrudOptions = {}) {
-    await delay(400, 0, 0); //read has no failure simulation
-
-    return [...items.value].sort(
-      (a, b) =>
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-    );
+    await delay(400, 0, 0);
+    return taskStore.allTasks;
   }
 
   async function readOne(id?: string) {
-    await delay(400, 0, 0); //readOne has no failure simulation
+    await delay(400, 0, 0);
     if (!id) throw new Error("No ID provided to readOne");
-
-    return items.value.find((item: Task) => item.id === id);
+    return taskStore.getTaskById(id) ?? null;
   }
 
   async function update(data: Partial<Task>, id?: string) {
     if (id === undefined) throw new Error("No ID provided to update");
-    const prevItem = await readOne(id);
+    const prevItem = taskStore.getTaskById(id);
     if (!prevItem) return;
 
     // 30% chance to simulate another user editing this task
@@ -91,7 +89,9 @@ export function useCrud() {
       ...data,
       updatedAt: new Date(),
     };
-    items.value = replaceById(items.value, id, () => optimisticItem);
+
+    // Optimistic update to store
+    taskStore.updateTask(optimisticItem);
 
     try {
       await delay(400, 5, 0.2);
@@ -99,10 +99,8 @@ export function useCrud() {
       logActivity("task:update", optimisticItem.id);
       return optimisticItem;
     } catch (error) {
-      // rollback
-      items.value = replaceById(items.value, id, (item) =>
-        item.updatedAt === optimisticItem.updatedAt ? prevItem : item,
-      );
+      // Rollback
+      taskStore.updateTask(prevItem);
       throw Object.assign(error as Error, {
         id,
         optimistic: true,
@@ -112,16 +110,19 @@ export function useCrud() {
 
   async function remove(id?: string) {
     if (id === undefined) throw new Error("No ID provided to update");
-    const prevItem = items.value.find((item) => item.id === id);
+    const prevItem = taskStore.getTaskById(id);
     if (!prevItem) return; // idempotent
-    items.value = items.value.filter((item) => item.id !== id);
+
+    // Optimistic removal from store
+    taskStore.removeTask(id);
+
     try {
       await delay(400, 5, 0.2);
       user.removeTask(id);
       logActivity("task:delete", id);
     } catch (error) {
-      const stillDeleted = !items.value.some((item) => item.id === id);
-      if (stillDeleted) items.value = [...items.value, prevItem];
+      // Rollback
+      taskStore.addTask(prevItem);
       throw Object.assign(error as Error, {
         id,
         optimistic: true,
@@ -145,7 +146,6 @@ export function useCrud() {
   }
 
   return {
-    items,
     create,
     read,
     readOne,
