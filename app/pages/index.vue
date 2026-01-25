@@ -39,7 +39,7 @@ const { handleError } = useHandleError();
 const { start, stop } = useWebSocket();
 const { view } = storeToRefs(useViewStore());
 const taskStore = useTaskStore();
-const { rawTasks } = storeToRefs(taskStore);
+const { allTasks } = storeToRefs(taskStore);
 
 provide("loading", loading);
 
@@ -72,8 +72,8 @@ onMounted(async () => {
 });
 
 watch(
-  [rawTasks, view],
-  async ([newTasks, newView], [oldTasks, oldView]) => {
+  [allTasks, view],
+  async ([, newView], [, oldView]) => {
     try {
       let response;
       if (oldView !== newView) {

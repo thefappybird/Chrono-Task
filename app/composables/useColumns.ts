@@ -1,14 +1,5 @@
 const dropIndex = ref<number | null>(null);
 
-// Shared task sorting: by position if available, otherwise by updatedAt
-function sortTasks(tasks: Task[]): Task[] {
-  return tasks.slice().sort((a, b) => {
-    if (a.position != null && b.position != null)
-      return a.position - b.position;
-    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-  });
-}
-
 // Shared filtering logic for tasks
 function filterTasks(
   tasks: Task[],
@@ -30,6 +21,7 @@ function filterTasks(
 
 export function useColumns() {
   const taskStore = useTaskStore();
+  const { tasksByStatus, tasksByDate } = storeToRefs(taskStore);
   const { update, readOne } = useCrud();
   const columns = ref<Column[]>([]);
 
@@ -39,17 +31,26 @@ export function useColumns() {
   ) {
     try {
       const cols: Column[] = [
-        { id: "todo", title: "To Do", tasks: [] },
-        { id: "in-progress", title: "In Progress", tasks: [] },
-        { id: "done", title: "Completed", tasks: [] },
+        {
+          id: "todo",
+          title: "To Do",
+          tasks: filterTasks(tasksByStatus.value.todo, filterKey, filter),
+        },
+        {
+          id: "in-progress",
+          title: "In Progress",
+          tasks: filterTasks(
+            tasksByStatus.value["in-progress"],
+            filterKey,
+            filter,
+          ),
+        },
+        {
+          id: "done",
+          title: "Completed",
+          tasks: filterTasks(tasksByStatus.value.done, filterKey, filter),
+        },
       ];
-
-      for (const column of cols) {
-        const sorted = sortTasks(
-          taskStore.rawTasks.filter((task: Task) => task.status === column.id),
-        );
-        column.tasks = filterTasks(sorted, filterKey, filter);
-      }
 
       columns.value = cols;
       return cols;
@@ -68,26 +69,17 @@ export function useColumns() {
     const start = new Date(now.getFullYear(), now.getMonth(), 1);
     const end = new Date(now.getFullYear(), now.getMonth() + 2, 0);
 
-    // Build date groups
-    const groups: Record<string, Task[]> = {};
+    // Create columns for each date in the range
+    const cols: Column[] = [];
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      groups[d.toISOString().slice(0, 10)] = [];
+      const dateKey = d.toISOString().slice(0, 10);
+      const tasksForDate = tasksByDate.value[dateKey] || [];
+      cols.push({
+        id: dateKey,
+        title: dateKey,
+        tasks: filterTasks(tasksForDate, filterKey, filter),
+      });
     }
-
-    // Assign tasks by createdAt date
-    for (const task of taskStore.rawTasks) {
-      const dateKey = new Date(task.createdAt).toISOString().slice(0, 10);
-      if (groups[dateKey]) groups[dateKey].push(task);
-    }
-
-    // Create sorted columns with filtering applied
-    const cols: Column[] = Object.entries(groups)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([date, tasks]) => ({
-        id: date,
-        title: date,
-        tasks: filterTasks(sortTasks(tasks), filterKey, filter),
-      }));
 
     columns.value = cols;
     return cols;
