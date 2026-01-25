@@ -1,7 +1,9 @@
+const connection = ref<WebSocket | null>(null);
 export function useWebSocket(url = "wss://echo.websocket.org") {
-  const { startGenerator, stopGenerator } = useActivity();
-  const connection = ref<WebSocket | null>(null);
   const enabled = ref(false);
+  let timer: number | null = null;
+  const { createRandomActivity, addActivity, showActivityToast } =
+    useActivity();
 
   function start() {
     if (connection.value) return;
@@ -9,14 +11,25 @@ export function useWebSocket(url = "wss://echo.websocket.org") {
 
     connection.value.onopen = () => {
       enabled.value = true;
+      startGenerator();
     };
 
     connection.value.onmessage = (event: MessageEvent) => {
-      // keep a console log for now so devs can inspect messages
-      console.log("ws:message", event);
+      try {
+        const message = JSON.parse(event.data);
+        if (message.type === "activity") {
+          const activity = addActivity(message.data);
+          showActivityToast(activity);
+        }
+      } catch (e) {
+        console.log("ws:message", event);
+      }
     };
 
     connection.value.onclose = () => {
+      console.log("closed");
+
+      stopGenerator();
       enabled.value = false;
       connection.value = null;
     };
@@ -37,15 +50,39 @@ export function useWebSocket(url = "wss://echo.websocket.org") {
     enabled.value = false;
   }
 
-  onMounted(() => {
-    start();
-    startGenerator();
-  });
+  function startGenerator(minSeconds = 5, maxSeconds = 15) {
+    const scheduleNext = () => {
+      if (!enabled.value) return;
+      const minMs = Math.max(0, Math.floor(minSeconds) * 1000);
+      const maxMs = Math.max(minMs, Math.floor(maxSeconds) * 1000);
+      const delta = maxMs - minMs;
+      const intervalMs = minMs + Math.floor(Math.random() * (delta + 1));
+      timer = window.setTimeout(() => {
+        const activity = createRandomActivity();
+        if (activity) {
+          broadcastActivity(activity);
+        }
+        scheduleNext();
+      }, intervalMs) as unknown as number;
+    };
+    scheduleNext();
+  }
 
-  onBeforeUnmount(() => {
-    stop();
-    stopGenerator();
-  });
+  function stopGenerator() {
+    if (timer) {
+      clearTimeout(timer as number);
+      timer = null;
+    }
+  }
 
-  return { connection, enabled, start, stop };
+  function broadcastActivity(activity: Activity) {
+    console.log("activity");
+
+    sendMessage(
+      JSON.stringify({ type: "activity", data: activity }),
+      connection.value,
+    );
+  }
+
+  return { connection, enabled, start, stop, broadcastActivity };
 }
